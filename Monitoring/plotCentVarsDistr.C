@@ -35,6 +35,10 @@
 //private setup
 #include "../utils.h"
 
+// global vars definition
+const char* trigcap("");
+const char* evSelCut("");
+
 void plotVar(TTree* t1=0 ,TString var="hiHF", int nBins=10, double xMin=0, double xMax=10, TCut cut1="(1)", const string cap = "");
 void plotCentVarsDistr(const char* fname = "/afs/cern.ch/user/k/kjung/public/forestTests/HiForestAOD_run284755_lumi414.root")
 {
@@ -59,9 +63,15 @@ void plotCentVarsDistr(const char* fname = "/afs/cern.ch/user/k/kjung/public/for
   
   int nBin = 50;
   const char* trigcut = "(HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part1_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part2_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part3_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part4_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part5_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part6_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part7_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part8_v1)";
-  const char* selCut = Form("%s && pBeamScrapingFilter && pPAprimaryVertexFilter",trigcut);
-  const string cap = "HIMinimumBias2_run262921";
+  trigcap = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part*";
+  evSelCut = "pBeamScrapingFilter && pPAprimaryVertexFilter && phfCoincFilter1 && pVertexFilterCutG";
+  const char* selCut ="" ;//= Form("%s && %s",trigcut,evSelCut);
+  const string cap = "pAMinimumBias_runX";
   plotVar(t1, "hiHF",nBin,0,hiHFMax,selCut, cap);
+  plotVar(t1, "hiHFplus",nBin,0,hiHFMax,selCut, cap);
+  plotVar(t1, "hiHFminus",nBin,0,hiHFMax,selCut, cap);
+  plotVar(t1, "hiHFplusEta4",nBin,0,hiHFMax,selCut, cap);
+  plotVar(t1, "hiHFminusEta4",nBin,0,hiHFMax,selCut, cap);
   plotVar(t1, "hiBin",nBin,0,hiBinMax,selCut, cap);
   plotVar(t1, "hiHFhit",nBin,0,hiHFhitMax,selCut, cap);
   plotVar(t1, "hiET",nBin,0,hiETMax,selCut, cap);
@@ -69,8 +79,13 @@ void plotCentVarsDistr(const char* fname = "/afs/cern.ch/user/k/kjung/public/for
   plotVar(t1, "hiEE",nBin,0,hiEEMax,selCut, cap);
   plotVar(t1, "hiNpix",nBin,0,hiNpixMax,selCut, cap);
   plotVar(t1, "hiNtracks",nBin,0,hiNtracksMax,selCut, cap);
-  plotVar(t1, "hiNpixelTracks",nBin,0,hiNpixelTracksMax,selCut, cap);
+  plotVar(t1, "hiNtracksPtCut",nBin,0,hiNtracksMax,selCut, cap);
+  plotVar(t1, "hiNtracksEtaCut",nBin,0,hiNtracksMax,selCut, cap);
+  plotVar(t1, "hiNtracksEtaPtCut",nBin,0,hiNtracksMax,selCut, cap);
+  //  plotVar(t1, "hiNpixelTracks",nBin,0,hiNpixelTracksMax,selCut, cap);
   plotVar(t1, "hiZDC",nBin,0,hiZDCMax,selCut, cap);
+  plotVar(t1, "hiZDCplus",nBin,0,hiZDCMax,selCut, cap);
+  plotVar(t1, "hiZDCminus",nBin,0,hiZDCMax,selCut, cap);
   
 } // main function
 
@@ -82,12 +97,12 @@ void plotVar(TTree* t1, TString var, int nBins, double xMin, double xMax, TCut c
   
   static int j = 0;
   TCanvas* c=  new TCanvas(Form("c_%s_%d",var.Data(),j),"", 700,600);
-  gPad->SetLogy();
+  if (strcmp(var,"hiBin")) gPad->SetLogy();
   
   TH1D* h1 = new TH1D(Form("h1_%s_%d",var.Data(),j), Form(";%s;",var.Data()), nBins,xMin,xMax);
   h1->Sumw2();
   t1->Draw(Form("%s>>%s",var.Data(),h1->GetName()), cut1);
-//  h1->Scale( 1. / t1->GetEntries(cut1));
+  //  h1->Scale( 1. / t1->GetEntries(cut1));
   SetHistColor(h1,2);
   h1->SetMarkerStyle(20);
   h1->SetMarkerSize(0.8);
@@ -96,14 +111,21 @@ void plotVar(TTree* t1, TString var, int nBins, double xMin, double xMax, TCut c
   legStyle(l1);
   l1->AddEntry(h1, "Data", "p");
   
-//  double range = cleverRange(h1,1.5,1.e-4);
+  //  double range = cleverRange(h1,1.5,1.e-4);
   h1->DrawCopy("L");
   l1->Draw("same");
   
   drawText(cap.data(),0.2,0.2+0.7);
   //drawText(cut1.GetTitle(),0.2,0.2);
-  drawText("HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part*_v1",0.2,0.2+0.06);
-  drawText("pBeamScrapingFilter && pPAprimaryVertexFilter",0.2,0.2);
-  c->SaveAs(Form("centralityDistributions/compare_%s_%s.pdf",var.Data(),cap.data()));
+  drawText(trigcap,0.2,0.2+0.06);
+  drawText(evSelCut,0.2,0.2);
+  
+  // save canvas
+  string mainDIR = gSystem->ExpandPathName(gSystem->pwd());
+  string saveDIR = mainDIR + "/centralityDistributions/";
+  void * dirp = gSystem->OpenDirectory(saveDIR.c_str());
+  if (dirp) gSystem->FreeDirectory(dirp);
+  else gSystem->mkdir(saveDIR.c_str(), kTRUE);
+  c->SaveAs(Form("centralityDistributions/distribution_%s_%s.pdf",var.Data(),cap.data()));
   j++;
 }
