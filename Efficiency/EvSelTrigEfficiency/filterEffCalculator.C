@@ -58,10 +58,10 @@ void filterEffCalculator()
     fout << "Number of "<< trig << " = " << minBiasN << endl;
     fout << "trig efficiency " << " = " << (double)minBiasN/(double)totalN*100 << "\t%" << endl;
     for(int i=1;i<nfilter;i++){
-        const char* tmpTrig = Form("(%s==1 && %s==1)",trig, evtfilter[i]);
+        const char* tmpTrig = Form("(%s==1)",evtfilter[i]);
         int filterN = t->GetEntries(tmpTrig);
         //fout << evtfilter[i] << "::: efficiency = \t" << filterN << "\t/\t" << minBiasN << " =\t" << (double)filterN/(double)minBiasN*100 <<"\t%" << endl;
-        fout << evtfilter[i] << "::: efficiency = \t" << filterN << "\t/\t" << minBiasN << " =\t" << (double)filterN/(double)totalN*100 <<"\t%" << endl;
+        fout << evtfilter[i] << "::: efficiency = \t" << filterN << "\t/\t" << totalN << " =\t" << (double)filterN/(double)totalN*100 <<"\t%" << endl;
     }
     fout << endl;
     for(int i=1;i<nfilter;i++){
@@ -72,7 +72,7 @@ void filterEffCalculator()
         tmpTrig1 += ")";
         int filterN = t->GetEntries(tmpTrig1);
         //fout << evtfilter[i] << "::: accu efficiency = \t" << filterN << "\t/\t" << minBiasN << " =\t" << (double)filterN/(double)minBiasN*100 <<"\t%" << endl;
-        fout << evtfilter[i] << "::: accu efficiency = \t" << filterN << "\t/\t" << minBiasN << " =\t" << (double)filterN/(double)totalN*100 <<"\t%" << endl;
+        fout << evtfilter[i] << "::: accu efficiency = \t" << filterN << "\t/\t" << totalN << " =\t" << (double)filterN/(double)totalN*100 <<"\t%" << endl;
     }
 }
 
