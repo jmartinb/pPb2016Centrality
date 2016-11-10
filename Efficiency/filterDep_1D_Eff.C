@@ -21,74 +21,95 @@
 #include "TPad.h"
 #include "stdio.h"
 #include <iostream>
-#include "../utils.h"
+#include "yjUtility.h"
+#include "par.h"
 
 //////////// modify here as you want!! ////////////////
-const int nfilter = 5;
-const char* evtfilter[] = {"","pprimaryVertexFilter", "phfCoincFilter3", "pclusterCompatibilityFilter", "pcollisionEventSelection"};
 const double dy= 0.5;
-const int colhere[] = {1,28,8,46,9};
-void Get1DEffPlots(TTree* t_evt=0, TString v1="hiHF",int xbin=200, double xmin=0, double xmax=4500, TCut cut="",const char* cap="", bool isPassed=0,bool isAOD=0);
+const int colhere[] = {1,1,2,4,6,9};
+void Get1DEffPlots(TTree* t_evt=0, TString v1="hiHF",int xbin=200, double xmin=0, double xmax=4500, TCut cut="",TString cap="", bool isPassed=0,bool isAOD=0);
 
 void filterDep_1D_Eff(
-        const char* fname="/u/user/goyeonju/scratch/files/forest/centrality/HiForestAOD_data_PbPb_withTowers_MinimumBias1_TriggerFilters_run262921_v1.root",
-        const char* type="Run262921", 
-        TCut trig = "HLT_HIL1MinimumBiasHF1AND_v1",
-        bool isAOD=0)
+     //   const char* fname="/afs/cern.ch/work/q/qixu/public/centrality",
+        /*
+        HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part2_v1 ||\
+        HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part3_v1 ||\
+        HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part4_v1 || \
+        HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part5_v1 || \
+        HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part6_v1 || \
+        HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part7_v1 ||\
+        HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part8_v1 \
+        */ bool isAOD=0)
 {
     TH1::SetDefaultSumw2();
     gStyle -> SetOptStat(0);
     SetHistTitleStyle(0.06,0.04);
     SetyjPadStyle();
 
-    TFile *fin = TFile::Open(fname);
-    TTree *t_evt = (TTree*) fin -> Get("hiEvtAnalyzer/HiTree");
-    TTree *t_skim = (TTree*) fin -> Get("skimanalysis/HltTree");
-    TTree *t_hlt = (TTree*) fin -> Get("hltanalysis/HltTree");
-    t_evt -> AddFriend(t_hlt);
-    t_evt -> AddFriend(t_skim);
+    TChain *t_evt = new TChain("hiEvtAnalyzer/HiTree");
+    TChain *t_skim = new TChain("skimanalysis/HltTree");
+    TChain *t_hlt = new TChain("hltanalysis/HltTree");
+    for(int i=startpoint;i<nfile;i++){
+        cout << "open file : " << Form("%s/%s%d.root",fname,histoname,i) << endl;
+        t_evt->AddFile(Form("%s/%s%d.root",fname,histoname,i));
+        t_skim->AddFile(Form("%s/%s%d.root",fname,histoname,i));
+        t_hlt->AddFile(Form("%s/%s%d.root",fname,histoname,i));
+    }
+    t_evt-> AddFriend(t_skim);
+    t_evt-> AddFriend(t_hlt);
 
-    double Nevt_t = t_evt -> GetEntries(trig);
-    cout << "Trigger is '" << trig.GetTitle() << "' and # of events = " << Nevt_t << endl;
+    double Nevt_t = t_evt -> GetEntries(cut);
+    cout << "cut is '" << cut.GetTitle() << "' and # of events = " << Nevt_t << endl;
 
-    Get1DEffPlots(t_evt, "hiHF",100,0,5000,trig,type,1,isAOD);
-    Get1DEffPlots(t_evt, "hiHFhit",100,0,4000,trig,type,1,isAOD);
-    Get1DEffPlots(t_evt, "hiNpix",100,0,10000,trig,type,1,isAOD);
-    Get1DEffPlots(t_evt, "hiBin",105,0,210,trig,type,1,isAOD);
-   // Get1DEffPlots(t_evt, "hiZDC",100,0,50000,trig,type,1,isAOD);
-    Get1DEffPlots(t_evt, "hiET",100,0,2000,trig,type,1,isAOD);
-    Get1DEffPlots(t_evt, "hiEE",100,0,4000,trig,type,1,isAOD);
-    Get1DEffPlots(t_evt, "hiEB",100,0,5000,trig,type,1,isAOD);
-
-    Get1DEffPlots(t_evt, "hiHF",100,0,100,trig,Form("%s_shortRange",type),1,isAOD);
-    Get1DEffPlots(t_evt, "hiHFhit",100,0,1000,trig,Form("%s_shortRange",type),1,isAOD);
-    Get1DEffPlots(t_evt, "hiNpix",100,0,300,trig,Form("%s_shortRange",type),1,isAOD);
-    Get1DEffPlots(t_evt, "hiBin",100,100,200,trig,Form("%s_shortRange",type),1,isAOD);
-   // Get1DEffPlots(t_evt, "hiZDC",100,0,5000,trig,Form("%s_shortRange",type),1,isAOD);
-    Get1DEffPlots(t_evt, "hiET",20,0,20,trig,Form("%s_shortRange",type),1,isAOD);
-    Get1DEffPlots(t_evt, "hiEE",20,0,20,trig,Form("%s_shortRange",type),1,isAOD);
-    Get1DEffPlots(t_evt, "hiEB",80,0,80,trig,Form("%s_shortRange",type),1,isAOD);
+/*
+    Get1DEffPlots(t_evt, "hiHF",100,0,5000,cut,Form("%s fullRange",type.Data()),1,isAOD);
+    Get1DEffPlots(t_evt, "hiHFplusEta4",100,0,5000,cut,Form("%s fullRange",type.Data()),1,isAOD);
+    Get1DEffPlots(t_evt, "hiHFhit",100,0,4000,cut,Form("%s fullRange",type.Data()),1,isAOD);
+    Get1DEffPlots(t_evt, "hiNpix",100,0,10000,cut,Form("%s fullRange",type.Data()),1,isAOD);
+    Get1DEffPlots(t_evt, "hiBin",100,0,10000,cut,Form("%s fullRange",type.Data()),1,isAOD);
+    Get1DEffPlots(t_evt, "hiNtracks",100,0,10000,cut,Form("%s fullRange",type.Data()),1,isAOD);
+   // Get1DEffPlots(t_evt, "hiZDC",100,0,50000,cut,Form("%s fullRange",type.Data()),1,isAOD);
+    Get1DEffPlots(t_evt, "hiET",100,0,2000,cut,Form("%s fullRange",type.Data()),1,isAOD);
+    Get1DEffPlots(t_evt, "hiEE",100,0,4000,cut,Form("%s fullRange",type.Data()),1,isAOD);
+    Get1DEffPlots(t_evt, "hiEB",100,0,5000,cut,Form("%s fullRange",type.Data()),1,isAOD);
+*//*
+    Get1DEffPlots(t_evt, "hiHF",100,0,100,cut,Form("%s",type.Data()),1,isAOD);
+    Get1DEffPlots(t_evt, "hiHFplus",100,0,100,cut,Form("%s",type.Data()),1,isAOD);
+    Get1DEffPlots(t_evt, "hiHFminus",100,0,100,cut,Form("%s",type.Data()),1,isAOD);
+    Get1DEffPlots(t_evt, "hiHFplusEta4",70,0,70,cut,Form("%s",type.Data()),1,isAOD);
+    Get1DEffPlots(t_evt, "hiHFminusEta4",100,0,100,cut,Form("%s",type.Data()),1,isAOD);
+    Get1DEffPlots(t_evt, "hiHFhit",100,0,1000,cut,Form("%s",type.Data()),1,isAOD);
+    Get1DEffPlots(t_evt, "hiNpix",100,0,300,cut,Form("%s",type.Data()),1,isAOD);
+    Get1DEffPlots(t_evt, "hiBin",200,0,200,cut,Form("%s",type.Data()),1,isAOD);
+    Get1DEffPlots(t_evt, "hiNtracks",100,0,200,cut,Form("%s",type.Data()),1,isAOD);
+   // Get1DEffPlots(t_evt, "hiZDC",100,0,5000,cut,Form("%s",type.Data()),1,isAOD);
+    Get1DEffPlots(t_evt, "hiET",20,0,20,cut,Form("%s",type.Data()),1,isAOD);
+    Get1DEffPlots(t_evt, "hiEE",20,0,20,cut,Form("%s",type.Data()),1,isAOD);
+    Get1DEffPlots(t_evt, "hiEB",80,0,80,cut,Form("%s",type.Data()),1,isAOD);
+    */
+    Get1DEffPlots(t_evt, "hiBin",200,0,200,cut,Form("%s",type.Data()),1,isAOD);
 }
 
-void Get1DEffPlots(TTree* t_evt, TString v1, int xbin, double xmin, double xmax, TCut cut,const char* cap, bool isPassed, bool isAOD)
+void Get1DEffPlots(TTree* t_evt, TString v1, int xbin, double xmin, double xmax, TCut cut, TString cap, bool isPassed, bool isAOD)
 {
-    TCanvas *c_tot = new TCanvas(Form("c_tot_%s_%s",v1.Data(),cap), "c_tot", 300,600);
+    TCanvas *c_tot = new TCanvas(Form("c_tot_%s_%s",v1.Data(),cap.Data()), "c_tot", 300,600);
     c_tot->Divide(1,2);
-
     TCut totcut[nfilter];
     for(int i=0; i<nfilter;i++){
-        if(i==0) totcut[i] = cut; 
-        else totcut[i] = cut && Form("%s==%d",evtfilter[i],(int)isPassed);
+        totcut[i] = "";
+        for(int j=1;j<=i;j++){
+        totcut[i] = totcut[i] && Form("%s==%d",evtfilter[j],(int)isPassed);
+        }
     }
 
-    TCanvas *c_temp= new TCanvas(Form("c_temp_%s",cap), "", 300,300);
+    TCanvas *c_temp= new TCanvas(Form("c_temp_%s",cap.Data()), "", 300,300);
     TH1D *h1D[nfilter];
     TH1D *h1D_eff[nfilter];
     for(int i=0; i<nfilter; i++){
-        h1D[i] = new TH1D(Form("h1D_%d",i), Form(";%s;Events", v1.Data()), xbin, xmin,xmax );
-        if(i!=0) h1D[i]->SetMarkerStyle(24+i); 
+        h1D[i] = new TH1D(Form("h1D_%s",evtfiltershort[i]), Form(";%s;Events", v1.Data()), xbin, xmin,xmax );
+        h1D[i]->SetMarkerStyle(24+i); 
         h1D[i]->SetMarkerSize(0.8);
-        h1D_eff[i] = (TH1D*)h1D[i]->Clone(Form("h1D_eff_%d",i));
+        h1D_eff[i] = (TH1D*)h1D[i]->Clone(Form("h1D_eff_%s",evtfiltershort[i]));
         h1D_eff[i] -> SetTitle(Form(";%s;Filter Rate",v1.Data()));
         SetHistColor(h1D[i],colhere[i]);
         SetHistColor(h1D_eff[i],colhere[i]);
@@ -98,21 +119,24 @@ void Get1DEffPlots(TTree* t_evt, TString v1, int xbin, double xmin, double xmax,
         h1D[i]=(TH1D*)gDirectory->Get(h1D[i]->GetName());
         if(i!=0) h1D_eff[i] -> Divide(h1D[i],h1D[0],1,1,"B");
     }
-    TLegend* l1 = new TLegend(0.30, 0.61, 0.9, 0.95, Form("%s",cap));
+    TLegend* l1 = new TLegend(0.30, 0.19, 0.9, 0.58, Form("%s",cap.Data()));
     legStyle(l1);
+    l1->SetTextSize(0.04);
     for(int i=0; i<nfilter;i++){
-        if(i==0) l1->AddEntry(h1D[0], "NO FILTER", "l"); 
-        else l1->AddEntry(h1D[i], evtfilter[i]); 
+ //       if(i==0) l1->AddEntry(h1D[i], "NO FILTER", "l");  else
+            l1->AddEntry(h1D[i], evtfiltershort[i]); 
     }
 
+    if(v1=="hiBin")h1D[0]->SetMinimum(0);
     for(int i=0;i<nfilter;i++){
         c_tot->cd(1);
-        if(i==0) h1D[i] -> DrawCopy("hist");
+        if(i==0) h1D[i]->DrawCopy("hist");
         else h1D[i] -> DrawCopy("ep same");
         l1 -> Draw();
         if(i!=0){
             c_tot->cd(2);
-            h1D_eff[i]->GetYaxis()-> SetRangeUser(h1D_eff[nfilter-1]->GetMinimum()*0.9,1.0);
+            //h1D_eff[i]->GetYaxis()-> SetRangeUser(h1D_eff[nfilter-1]->GetMinimum()*0.9,1.0);
+            h1D_eff[i]->GetYaxis()-> SetRangeUser(0.0,1.0);
             if(i==1) {
                 h1D_eff[i] -> DrawCopy("ep"); 
                 jumSun(xmin,1,xmax,1);
@@ -120,9 +144,9 @@ void Get1DEffPlots(TTree* t_evt, TString v1, int xbin, double xmin, double xmax,
             else h1D_eff[i] -> DrawCopy("ep same"); 
         }
     }
-    c_tot->SaveAs(Form("pdf/filterDep_1D_Eff_%s_%s.pdf",v1.Data(),cap));
-/*
-    TFile* outf = new TFile(Form("histfiles/filterEff_1D_%s_%s.root",v1.Data(),cap), "RECREATE");
+    c_tot->SaveAs(Form("figure/filterDep_1D_Eff_%s_%s.gif",v1.Data(),cap.Data()));
+
+    TFile* outf = new TFile(Form("histfiles/filterEff_1D_%s_%s.root",v1.Data(),cap.Data()), "RECREATE");
     outf->cd();
     for(int i=0; i<nfilter; i++){
         h1D[i]->Write();
@@ -130,7 +154,7 @@ void Get1DEffPlots(TTree* t_evt, TString v1, int xbin, double xmin, double xmax,
     }
     c_tot->Write();
     outf->Close();
-*/
+
     for(int i=0; i<nfilter; i++){
         delete h1D[i];
         delete h1D_eff[i];

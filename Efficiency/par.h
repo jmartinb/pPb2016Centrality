@@ -1,0 +1,11 @@
+    //const char *fname="root://eoscms//store/group/phys_heavyions/kjung/pPb_EposMinBias_5TeV_8022_Forest_corrL1/EPOS5TeV_GEN_SIM/crab_pPb_EposMinBias_5TeV_8022_Forest_corrL1/161106_174912/0000"; //old
+    const char *fname = "root://eoscms//store/group/phys_heavyions/kjung/pPb_EposMinBias_5TeV_8022_Forest/EPOS5TeV_GEN_SIM/crab_pPb_EposMinBias_5TeV_8022_Forest_corrCentrTable/161108_122954/0000";
+    const char *histoname = "HiForestAOD_";
+    const int nfilter = 6;
+    const int startpoint = 1;
+    const int nfile = 191;
+    const char* evtfilter[] = {"","HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part1_v1","pBeamScrapingFilter","pPAprimaryVertexFilter","pVertexFilterCutG","phfCoincFilter1"};
+    const char* evtfiltershort[] = {"No filter","MB trig","MB trig+beam scraping","trig+beam+vertex","trig+beam+vertex+pile-up","trig+beam+vtx+pileup+hfcoin1"};
+    const char* trig = evtfilter[1];
+    TCut cut = evtfilter[1];
+    const TString type="Epos 5TeV pPb";
