@@ -4,6 +4,7 @@
 #include "TF1.h"
 #include "TH1.h"
 #include "TH2.h"
+#include "TParameter.h"
 #include "TString.h"
 #include "TChain.h"
 #include <iostream>
@@ -17,14 +18,38 @@ using namespace std;
 
 bool descend(float i,float j) { return (i>j); }
 
-void makeDataCentralityTable(int nbins = 200, const string label = "HFtowers", const char * tag = "CentralityTable_HFtowers200_OfficialMBHydjet5020GeV_ppHF_eff99_run1v750x01_offline", double EFF = 0.99){
+void makeDataCentralityTable(int nbins = 200, const string label = "HFtowersPlusTrunc", const char * tag = "CentralityTable_HFtowersPlusTrunc200_Glauber_effHisto_run2v80x01_offline", bool useEffHisto = true, const char* fEff = "fileEff.root"){
   
   TH1D::SetDefaultSumw2();
   
-  //This macro assumes all inefficiency is in the most peripheral bins
-  double MXS = 1. - EFF;
+  TFile* fHeff = TFile::Open(fEff);
+  if (!fHeff)
+  {
+    cout << "ERROR: No efficiency file found" << endl;
+    return;
+  }
+  TH1* hEff(0x0);
+  TParameter<long>* gEff(0x0);
+  if (useEffHisto)
+  {
+    hEff = static_cast<TH1*>(fHeff->FindObjectAny("effHisto"));
+    if (!hEff)
+    {
+      cout << "ERROR: No efficiency histo found in file " << fEff << endl;
+      return;
+    }
+  }
+  else
+  {
+    gEff = static_cast<TParameter<long>*>(fHeff->FindObjectAny("effParameter"));
+    if (!gEff)
+    {
+      cout << "ERROR: No integrated efficiency parameter found in file " << fEff << endl;
+      return;
+    }
+  }
   
-  TString inFileName = "files_DataPPHF_HIMinimumBias2.txt";
+  TString inFileName = "files_Data_pAMinimumBias.txt";
   char line[1024];
   ifstream in(inFileName);
   TChain * t = new TChain("hiEvtAnalyzer/HiTree","");
@@ -40,7 +65,7 @@ void makeDataCentralityTable(int nbins = 200, const string label = "HFtowers", c
   t->AddFriend(tskimanalysis);
   t->AddFriend(thltanalysis);
   
-  TFile *outFile = new TFile("CentralityTable_HFtowers200_DataPPHF_eff99_d20160904_v1.root","recreate");
+  TFile *outFile = new TFile("CentralityTable_HFtowersPlusTrunc200_Glauber_effHisto_d20160904_v1.root","recreate");
   
   TDirectory *dir = outFile->mkdir(tag);
   dir->cd();
@@ -54,14 +79,19 @@ void makeDataCentralityTable(int nbins = 200, const string label = "HFtowers", c
   TFile * inputMCfile = TFile::Open("/afs/cern.ch/user/j/jmartinb/CMSSW/CMSSW_7_5_8_patch3/src/HeavyIonsAnalysis/CentralityAnalysis/tools/CentralityTable_HFtowers_OfficialMBHydjet5020GeV_d20160731_v1.root");
   CentralityBins* inputMCtable = (CentralityBins*)inputMCfile->Get("CentralityTable_HFtowers200_OfficialMBHydjet5020GeV_v750x01_mc/run1");
   
-  ofstream txtfile("output_DataPPHF_d20160904.txt");
+  ofstream txtfile("output_Data_d20160904.txt");
   txtfile << "Input tree: " << inFileName << endl;
   
   double binboundaries[nbins+1];
   vector<float> values;
   
   float hf, hfplus, hfpluseta4, hfminuseta4, hfminus, hfhit, ee, eb, zdc, zdcplus, zdcminus;
-  int run, lumi, npix, npixtrks, ntrks, HLT_HIL1MinimumBiasHF1AND_v1 ,pcollisionEventSelection;
+  int run, lumi, npix, npixtrks, ntrks;
+  int HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part1_v1, HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part2_v1,
+  HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part3_v1, HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part4_v1,
+  HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part5_v1, HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part6_v1,
+  HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part7_v1, HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part8_v1;
+  int pBeamScrapingFilter, pPAprimaryVertexFilter, phfCoincFilter1, pVertexFilterCutG;
   t->SetBranchAddress("run",	&run);
   t->SetBranchAddress("lumi",	&lumi);
   t->SetBranchAddress("hiHF",		&hf);
@@ -78,8 +108,18 @@ void makeDataCentralityTable(int nbins = 200, const string label = "HFtowers", c
   t->SetBranchAddress("hiNpix",		&npix);
   t->SetBranchAddress("hiNpixelTracks",	&npixtrks);
   t->SetBranchAddress("hiNtracks",	&ntrks);
-  t->SetBranchAddress("HLT_HIL1MinimumBiasHF1AND_v1", &HLT_HIL1MinimumBiasHF1AND_v1);
-  t->SetBranchAddress("pcollisionEventSelection", &pcollisionEventSelection);
+  t->SetBranchAddress("HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part1_v1", &HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part1_v1);
+  t->SetBranchAddress("HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part2_v1", &HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part2_v1);
+  t->SetBranchAddress("HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part3_v1", &HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part3_v1);
+  t->SetBranchAddress("HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part4_v1", &HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part4_v1);
+  t->SetBranchAddress("HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part5_v1", &HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part5_v1);
+  t->SetBranchAddress("HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part6_v1", &HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part6_v1);
+  t->SetBranchAddress("HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part7_v1", &HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part7_v1);
+  t->SetBranchAddress("HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part8_v1", &HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part8_v1);
+  t->SetBranchAddress("pBeamScrapingFilter", &pBeamScrapingFilter);
+  t->SetBranchAddress("pPAprimaryVertexFilter", &pPAprimaryVertexFilter);
+  t->SetBranchAddress("phfCoincFilter1", &phfCoincFilter1);
+  t->SetBranchAddress("pVertexFilterCutG", &pVertexFilterCutG);
   
   bool binHF = label.compare("HFtowers") == 0;
   bool binHFplus = label.compare("HFtowersPlus") == 0;
@@ -93,12 +133,18 @@ void makeDataCentralityTable(int nbins = 200, const string label = "HFtowers", c
   unsigned int Nevents = t->GetEntries();
   txtfile << "Number of events = " << Nevents << endl << endl;
   
+  unsigned int totalXsec(0);
+  
   for(unsigned int iev = 0; iev < Nevents; iev++) {
     
     if(iev%50000 == 0) cout<<"Processing event: " << iev << " / " << Nevents << endl;
     t->GetEntry(iev);
     
-    if (!HLT_HIL1MinimumBiasHF1AND_v1 || !pcollisionEventSelection) continue;
+    if (!HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part1_v1 || !HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part2_v1 ||
+        !HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part3_v1 || !HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part4_v1 ||
+        !HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part5_v1 || !HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part6_v1 ||
+        !HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part7_v1 || !HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part8_v1 ||
+        !pBeamScrapingFilter || !pPAprimaryVertexFilter || !phfCoincFilter1 || !pVertexFilterCutG) continue;
     
     float parameter = -1;
     if(binHF) parameter = hf;
@@ -113,6 +159,7 @@ void makeDataCentralityTable(int nbins = 200, const string label = "HFtowers", c
     values.push_back(parameter);
     nt->Fill(parameter);
     
+    totalXsec += 1./hEff->GetBinContent(hEff->FindBin(parameter));
   }
   
   sort(values.begin(),values.end());
@@ -124,11 +171,33 @@ void makeDataCentralityTable(int nbins = 200, const string label = "HFtowers", c
   int size = values.size();
   binboundaries[nbins] = values[size-1];
   
-  for(int i = 0; i < nbins; i++) {
-    int entry = (int)( i*(size/EFF/nbins) - size*(1 - EFF)/EFF );
-    if(entry < 0 || i == 0) binboundaries[i] = 0;
-    else binboundaries[i] = values[entry];
-    if(binboundaries[i] < 0) { binboundaries[i] = 0; cout << "*"; }
+  if (useEffHisto)
+  {
+    double integral = 0;
+    int currentbin = 0;
+    for(unsigned int iev = 0; iev < Nevents; iev++)
+    {
+      double val = values[iev];
+      integral += 1 / hEff->GetBinContent(hEff->FindBin(val));
+      
+      if (currentbin == 0) binboundaries[currentbin] = 0.;
+      else if(integral > (int)((currentbin+1)*(totalXsec/nbins)))
+      {
+        binboundaries[currentbin] = val;
+        
+        currentbin++;
+      }
+    }
+  }
+  else // This way assumes all inefficiency is in the most peripheral bins
+  {
+    double EFF = gEff->GetVal();
+    for(int i = 0; i < nbins; i++) {
+      int entry = (int)( i*(size/EFF/nbins) - size*(1 - EFF)/EFF );
+      if(entry < 0 || i == 0) binboundaries[i] = 0;
+      else binboundaries[i] = values[entry];
+      if(binboundaries[i] < 0) { binboundaries[i] = 0; cout << "*"; }
+    }
   }
   
   for(int i = 0; i < nbins; i++) {
