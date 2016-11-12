@@ -72,7 +72,7 @@ void filterDep_1D_Eff(
     Get1DEffPlots(t_evt, "hiET",100,0,2000,cut,Form("%s fullRange",type.Data()),1,isAOD);
     Get1DEffPlots(t_evt, "hiEE",100,0,4000,cut,Form("%s fullRange",type.Data()),1,isAOD);
     Get1DEffPlots(t_evt, "hiEB",100,0,5000,cut,Form("%s fullRange",type.Data()),1,isAOD);
-*//*
+*/
     Get1DEffPlots(t_evt, "hiHF",100,0,100,cut,Form("%s",type.Data()),1,isAOD);
     Get1DEffPlots(t_evt, "hiHFplus",100,0,100,cut,Form("%s",type.Data()),1,isAOD);
     Get1DEffPlots(t_evt, "hiHFminus",100,0,100,cut,Form("%s",type.Data()),1,isAOD);
@@ -86,8 +86,7 @@ void filterDep_1D_Eff(
     Get1DEffPlots(t_evt, "hiET",20,0,20,cut,Form("%s",type.Data()),1,isAOD);
     Get1DEffPlots(t_evt, "hiEE",20,0,20,cut,Form("%s",type.Data()),1,isAOD);
     Get1DEffPlots(t_evt, "hiEB",80,0,80,cut,Form("%s",type.Data()),1,isAOD);
-    */
-    Get1DEffPlots(t_evt, "hiBin",200,0,200,cut,Form("%s",type.Data()),1,isAOD);
+    
 }
 
 void Get1DEffPlots(TTree* t_evt, TString v1, int xbin, double xmin, double xmax, TCut cut, TString cap, bool isPassed, bool isAOD)
@@ -106,10 +105,10 @@ void Get1DEffPlots(TTree* t_evt, TString v1, int xbin, double xmin, double xmax,
     TH1D *h1D[nfilter];
     TH1D *h1D_eff[nfilter];
     for(int i=0; i<nfilter; i++){
-        h1D[i] = new TH1D(Form("h1D_%s",evtfiltershort[i]), Form(";%s;Events", v1.Data()), xbin, xmin,xmax );
+        h1D[i] = new TH1D(Form("h_%s_%s",v1.Data(),evtfiltershort[i]), Form(";%s;Events", v1.Data()), xbin, xmin,xmax );
         h1D[i]->SetMarkerStyle(24+i); 
         h1D[i]->SetMarkerSize(0.8);
-        h1D_eff[i] = (TH1D*)h1D[i]->Clone(Form("h1D_eff_%s",evtfiltershort[i]));
+        h1D_eff[i] = (TH1D*)h1D[i]->Clone(Form("hEff_%s_%s",v1.Data(),evtfiltershort[i]));
         h1D_eff[i] -> SetTitle(Form(";%s;Filter Rate",v1.Data()));
         SetHistColor(h1D[i],colhere[i]);
         SetHistColor(h1D_eff[i],colhere[i]);
@@ -119,7 +118,10 @@ void Get1DEffPlots(TTree* t_evt, TString v1, int xbin, double xmin, double xmax,
         h1D[i]=(TH1D*)gDirectory->Get(h1D[i]->GetName());
         if(i!=0) h1D_eff[i] -> Divide(h1D[i],h1D[0],1,1,"B");
     }
+    if(v1=="hiBin")
     TLegend* l1 = new TLegend(0.30, 0.19, 0.9, 0.58, Form("%s",cap.Data()));
+    else
+    TLegend* l1 = new TLegend(0.30, 0.54, 0.9, 0.94, Form("%s",cap.Data()));
     legStyle(l1);
     l1->SetTextSize(0.04);
     for(int i=0; i<nfilter;i++){
@@ -151,6 +153,9 @@ void Get1DEffPlots(TTree* t_evt, TString v1, int xbin, double xmin, double xmax,
     for(int i=0; i<nfilter; i++){
         h1D[i]->Write();
         h1D_eff[i]->Write();
+        TParameter<float>* eff = new TParameter<float>(Form("IntEff_%s",evtfiltershort[i]),0);
+        eff->SetVal(h1D[i]->Integral()/h1D[0]->Integral());
+        eff->Write();
     }
     c_tot->Write();
     outf->Close();
