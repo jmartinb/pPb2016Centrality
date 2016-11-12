@@ -36,11 +36,13 @@
 #include "../utils.h"
 
 // global vars definition
-const char* trigcap("");
-const char* evSelCut("");
+const char* trigcap;
+const char* evSelCut;
+const char* evSelCutCap;
 
 void plotVar(TTree* t1=0 ,TString var="hiHF", int nBins=10, double xMin=0, double xMax=10, TCut cut1="(1)", const string cap = "");
-void plotCentVarsDistr(const char* fname = "/afs/cern.ch/user/k/kjung/public/forestTests/HiForestAOD_run284755_lumi414.root")
+//void plotCentVarsDistr(const char* fname = "/afs/cern.ch/work/j/jmartinb/DataSets/pPb2016/Forest/Data/285090/HiForest.root")
+void plotCentVarsDistr(const char* fname = "/afs/cern.ch/work/j/jmartinb/DataSets/pPb2016/Forest/Data/285090/HiForest.root")
 {
   TFile* f1 = TFile::Open(fname);
   TTree* t1 = (TTree*) f1 -> Get("hiEvtAnalyzer/HiTree");
@@ -50,28 +52,37 @@ void plotCentVarsDistr(const char* fname = "/afs/cern.ch/user/k/kjung/public/for
   t1->AddFriend(t1_hlt);
   
   //total
-  double hiHFMax = 9000;
+  double hiHFMax = 300;
+  double hiHFSSMax = 200;
+  double hiHFSSTruncMax = 80;
   double hiBinMax = 200;
-  double hiHFhitMax = 250000;
-  double hiETMax = 1800;
-  double hiEEMax = 3500;
-  double hiEBMax = 4000;
-  double hiNpixMax = 50000;
-  double hiNpixelTracksMax = 5000;
-  double hiNtracksMax = 3500;
-  double hiZDCMax = 1;
+  double hiHFhitMax = 8000;
+  double hiETMax = 150;
+  double hiEEMax = 120;
+  double hiEBMax = 1200;
+  double hiNpixMax = 2000;
+  double hiNpixelTracksMax = 500;
+  double hiNtracksMax = 400;
+  double hiNtracksCutEtaMax = 350;
+  double hiNtracksCutMax = 150;
+  double hiZDCMax = 40000;
   
   int nBin = 50;
-  const char* trigcut = "(HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part1_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part2_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part3_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part4_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part5_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part6_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part7_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part8_v1)";
-  trigcap = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part*";
+//  const char* trigcut = "(HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part1_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part2_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part3_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part4_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part5_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part6_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part7_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part8_v1)";
+  const char* trigcut = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_ForExpress_v1";
+//  trigcap = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part*";
+  trigcap = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_ForExpress_v1";
   evSelCut = "pBeamScrapingFilter && pPAprimaryVertexFilter && phfCoincFilter1 && pVertexFilterCutG";
-  const char* selCut ="" ;//= Form("%s && %s",trigcut,evSelCut);
-  const string cap = "pAMinimumBias_runX";
+  TCut selCut = Form("%s && %s",trigcut,evSelCut);
+  const string cap = "pAExpress_5TeV_run285090";
+  evSelCutCap = "BS+PV+HFC+PVG";
+  cout << "Aplying the following event selection: " << selCut.GetTitle() << endl;
+  
   plotVar(t1, "hiHF",nBin,0,hiHFMax,selCut, cap);
-  plotVar(t1, "hiHFplus",nBin,0,hiHFMax,selCut, cap);
-  plotVar(t1, "hiHFminus",nBin,0,hiHFMax,selCut, cap);
-  plotVar(t1, "hiHFplusEta4",nBin,0,hiHFMax,selCut, cap);
-  plotVar(t1, "hiHFminusEta4",nBin,0,hiHFMax,selCut, cap);
+  plotVar(t1, "hiHFplus",nBin,0,hiHFSSMax,selCut, cap);
+  plotVar(t1, "hiHFminus",nBin,0,hiHFSSMax,selCut, cap);
+  plotVar(t1, "hiHFplusEta4",nBin,0,hiHFSSTruncMax,selCut, cap);
+  plotVar(t1, "hiHFminusEta4",nBin,0,hiHFSSTruncMax,selCut, cap);
   plotVar(t1, "hiBin",nBin,0,hiBinMax,selCut, cap);
   plotVar(t1, "hiHFhit",nBin,0,hiHFhitMax,selCut, cap);
   plotVar(t1, "hiET",nBin,0,hiETMax,selCut, cap);
@@ -79,9 +90,9 @@ void plotCentVarsDistr(const char* fname = "/afs/cern.ch/user/k/kjung/public/for
   plotVar(t1, "hiEE",nBin,0,hiEEMax,selCut, cap);
   plotVar(t1, "hiNpix",nBin,0,hiNpixMax,selCut, cap);
   plotVar(t1, "hiNtracks",nBin,0,hiNtracksMax,selCut, cap);
-  plotVar(t1, "hiNtracksPtCut",nBin,0,hiNtracksMax,selCut, cap);
-  plotVar(t1, "hiNtracksEtaCut",nBin,0,hiNtracksMax,selCut, cap);
-  plotVar(t1, "hiNtracksEtaPtCut",nBin,0,hiNtracksMax,selCut, cap);
+  plotVar(t1, "hiNtracksPtCut",nBin,0,hiNtracksCutMax,selCut, cap);
+  plotVar(t1, "hiNtracksEtaCut",nBin,0,hiNtracksCutEtaMax,selCut, cap);
+  plotVar(t1, "hiNtracksEtaPtCut",nBin,0,hiNtracksCutMax,selCut, cap);
   //  plotVar(t1, "hiNpixelTracks",nBin,0,hiNpixelTracksMax,selCut, cap);
   plotVar(t1, "hiZDC",nBin,0,hiZDCMax,selCut, cap);
   plotVar(t1, "hiZDCplus",nBin,0,hiZDCMax,selCut, cap);
@@ -95,13 +106,13 @@ void plotVar(TTree* t1, TString var, int nBins, double xMin, double xMax, TCut c
   SetyjPadStyle();
   gStyle->SetOptStat(0);
   
-  static int j = 0;
-  TCanvas* c=  new TCanvas(Form("c_%s_%d",var.Data(),j),"", 700,600);
+  TCanvas* c=  new TCanvas(Form("c_%s",var.Data()),"", 700,600);
   if (strcmp(var,"hiBin")) gPad->SetLogy();
   
-  TH1D* h1 = new TH1D(Form("h1_%s_%d",var.Data(),j), Form(";%s;",var.Data()), nBins,xMin,xMax);
+  TH1D* h1 = new TH1D(Form("h1_%s",var.Data()), Form(";%s;",var.Data()), nBins,xMin,xMax);
   h1->Sumw2();
-  t1->Draw(Form("%s>>%s",var.Data(),h1->GetName()), cut1);
+  TString sName(Form("%s>>+%s",var.Data(),h1->GetName()));
+  t1->Draw(sName.Data(), cut1);
   //  h1->Scale( 1. / t1->GetEntries(cut1));
   SetHistColor(h1,2);
   h1->SetMarkerStyle(20);
@@ -118,7 +129,7 @@ void plotVar(TTree* t1, TString var, int nBins, double xMin, double xMax, TCut c
   drawText(cap.data(),0.2,0.2+0.7);
   //drawText(cut1.GetTitle(),0.2,0.2);
   drawText(trigcap,0.2,0.2+0.06);
-  drawText(evSelCut,0.2,0.2);
+  drawText(evSelCutCap,0.2,0.2);
   
   // save canvas
   string mainDIR = gSystem->ExpandPathName(gSystem->pwd());
@@ -127,5 +138,4 @@ void plotVar(TTree* t1, TString var, int nBins, double xMin, double xMax, TCut c
   if (dirp) gSystem->FreeDirectory(dirp);
   else gSystem->mkdir(saveDIR.c_str(), kTRUE);
   c->SaveAs(Form("centralityDistributions/distribution_%s_%s.pdf",var.Data(),cap.data()));
-  j++;
 }

@@ -49,10 +49,11 @@
 // global vars definition
 const char* trigcap("");
 const char* evSelCut("");
+const char* evSelCutCap("");
 const char* mcCut("");
 
 void compareTwo(TTree* t1=0 ,TTree* t2=0,TString var="pt", int nBins=10, double xMin=0, double xMax=10, TCut cut1="(1)", TCut cut2="(1)", const string cap = "");
-void compare_data_mc_1D(const char* fname_data="/home/goyeonju/CMS/Files/centrality/EventTree_PbPb_data_HIMinimumBias2_run262921_15Feb.root", const char* fname_mc="/home/goyeonju/CMS/Files/centrality/HiForestAOD_HYDJET_Drum5Nv75_5020GeV_cmssw758patch3_genPtThr500GeV_merged.root")
+void compare_data_mc_1D(const char* fname_data="/afs/cern.ch/work/j/jmartinb/DataSets/pPb2016/Forest/Data/285090/HiForest.root", const char* fname_mc="/afs/cern.ch/work/q/qixu/public/centrality/Run2Prep/5TeV/mergeskim_pPb_EposMinBias_5TeV_8022_Forest_corrCentrTable_161108_122954.root")
 {
   TFile* f1 = TFile::Open(fname_data);
   TTree* t1 = (TTree*) f1 -> Get("hiEvtAnalyzer/HiTree");
@@ -67,46 +68,39 @@ void compare_data_mc_1D(const char* fname_data="/home/goyeonju/CMS/Files/central
   t2->AddFriend(t2_skim);
   t2->AddFriend(t2_hlt);
   
-  /*
-   //from DATA // this sample has no track info.
-   double hiHFMax = 5000;
-   double hiBinMax = 200;
-   double hiHFhitMax = 160000;
-   double hiETMax = 1600;
-   double hiEEMax = 2200;
-   double hiEBMax = 4000;
-   double hiNpixMax = 0;
-   double hiNpixelTracksMax = 40000;
-   double hiNtracksMax = 3500;
-   double hiNtracksPtCutMax = 2200;
-   double hiNtracksEtaCutMax = 3000;
-   double hiNtracksEtaPtCutMax = 1800;
-   double NPixClus= 1300;
-   */
   //total
-  double hiHFMax = 9000;
+  double hiHFMax = 300;
+  double hiHFSSMax = 200;
+  double hiHFSSTruncMax = 80;
   double hiBinMax = 200;
-  double hiHFhitMax = 250000;
-  double hiETMax = 1800;
-  double hiEEMax = 3500;
-  double hiEBMax = 4000;
-  double hiNpixMax = 50000;
-  double hiNpixelTracksMax = 5000;
-  double hiNtracksMax = 3500;
-  double hiZDCMax = 1;
+  double hiHFhitMax = 8000;
+  double hiETMax = 50;
+  double hiEEMax = 50;
+  double hiEBMax = 100;
+  double hiNpixMax = 2000;
+  double hiNpixelTracksMax = 500;
+  double hiNtracksMax = 400;
+  double hiNtracksCutEtaMax = 350;
+  double hiNtracksCutMax = 150;
+  double hiZDCMax = 40000;
   
   int nBin = 50;
-  const char* trigcut = "(HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part1_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part2_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part3_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part4_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part5_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part6_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part7_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part8_v1)";
-  trigcap = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part*";
+//  const char* trigcut = "(HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part1_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part2_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part3_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part4_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part5_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part6_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part7_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part8_v1)";
+   const char* trigcut = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_ForExpress_v1";
+//  trigcap = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part*";
+  trigcap = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_ForExpress_v1";
   evSelCut = "pBeamScrapingFilter && pPAprimaryVertexFilter && phfCoincFilter1 && pVertexFilterCutG";
-  const char* selCut ="" ;//= Form("%s && %s",trigcut,evSelCut);
-  const string cap = "pAMinimumBias_runX";
+  const string cap = "pAExpress_5TeV_run285090";
+  evSelCutCap = "BS+PV+HFC+PVG";
+  TCut selCut = Form("%s && %s",trigcut,evSelCut);
+  cout << "Aplying the following event selection: " << selCut.GetTitle() << endl;
+  
   mcCut = ""; //"pcollisionEventSelection";
   compareTwo(t1, t2, "hiHF",nBin,0,hiHFMax,selCut,mcCut, cap);
-  compareTwo(t1, t2, "hiHFplus",nBin,0,hiHFMax,selCut,mcCut, cap);
-  compareTwo(t1, t2, "hiHFminus",nBin,0,hiHFMax,selCut,mcCut, cap);
-  compareTwo(t1, t2, "hiHFplusEta4",nBin,0,hiHFMax,selCut,mcCut, cap);
-  compareTwo(t1, t2, "hiHFminusEta4",nBin,0,hiHFMax,selCut,mcCut, cap);
+  compareTwo(t1, t2, "hiHFplus",nBin,0,hiHFSSMax,selCut,mcCut, cap);
+  compareTwo(t1, t2, "hiHFminus",nBin,0,hiHFSSMax,selCut,mcCut, cap);
+  compareTwo(t1, t2, "hiHFplusEta4",nBin,0,hiHFSSTruncMax,selCut,mcCut, cap);
+  compareTwo(t1, t2, "hiHFminusEta4",nBin,0,hiHFSSTruncMax,selCut,mcCut, cap);
   compareTwo(t1, t2, "hiBin",nBin,0,hiBinMax,selCut,mcCut, cap);
   compareTwo(t1, t2, "hiHFhit",nBin,0,hiHFhitMax,selCut,mcCut, cap);
   compareTwo(t1, t2, "hiET",nBin,0,hiETMax,selCut,mcCut, cap);
@@ -114,9 +108,9 @@ void compare_data_mc_1D(const char* fname_data="/home/goyeonju/CMS/Files/central
   compareTwo(t1, t2, "hiEE",nBin,0,hiEEMax,selCut,mcCut, cap);
   compareTwo(t1, t2, "hiNpix",nBin,0,hiNpixMax,selCut,mcCut, cap);
   compareTwo(t1, t2, "hiNtracks",nBin,0,hiNtracksMax,selCut,mcCut, cap);
-  compareTwo(t1, t2, "hiNtracksPtCut",nBin,0,hiNtracksMax,selCut,mcCut, cap);
-  compareTwo(t1, t2, "hiNtracksEtaCut",nBin,0,hiNtracksMax,selCut,mcCut, cap);
-  compareTwo(t1, t2, "hiNtracksEtaPtCut",nBin,0,hiNtracksMax,selCut,mcCut, cap);
+  compareTwo(t1, t2, "hiNtracksPtCut",nBin,0,hiNtracksCutMax,selCut,mcCut, cap);
+  compareTwo(t1, t2, "hiNtracksEtaCut",nBin,0,hiNtracksCutEtaMax,selCut,mcCut, cap);
+  compareTwo(t1, t2, "hiNtracksEtaPtCut",nBin,0,hiNtracksCutMax,selCut,mcCut, cap);
   //  compareTwo(t1, t2, "hiNpixelTracks",nBin,0,hiNpixelTracksMax,selCut,mcCut, cap);
   compareTwo(t1, t2, "hiZDC",nBin,0,hiZDCMax,selCut,mcCut, cap);
   compareTwo(t1, t2, "hiZDCplus",nBin,0,hiZDCMax,selCut,mcCut, cap);
@@ -129,7 +123,7 @@ void compareTwo(TTree* t1, TTree* t2, TString var, int nBins, double xMin, doubl
   SetyjPadStyle();
   gStyle->SetOptStat(0);
   static int j = 0;
-  TCanvas* c=  new TCanvas(Form("c_%s_%d",var.Data(),j),"", 400,800);
+  TCanvas* c=  new TCanvas(Form("c_%s_%d",var.Data(),j),"", 500,900);
   c->Divide(1,2);
   c->cd(1);
   gPad->SetLogy();
@@ -169,8 +163,8 @@ void compareTwo(TTree* t1, TTree* t2, TString var, int nBins, double xMin, doubl
   jumSun(xMin,1,xMax,1);
   drawText(cap.data(),0.2,0.2+0.7);
   //drawText(cut1.GetTitle(),0.2,0.2);
-  drawText(Form("Trig.: %s",trigcap),0.2,0.2+0.12);
-  drawText(Form("Ev.sel.: %s",evSelCut),0.2,0.2+0.06);
+  drawText(Form("%s",trigcap),0.2,0.2+0.12);
+  drawText(Form("%s",evSelCutCap),0.2,0.2+0.06);
   drawText(Form("MC sel: %s",mcCut),0.2,0.2);
   
   // save canvas
