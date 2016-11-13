@@ -96,10 +96,10 @@ void compare_data_data_1D(const char* fname_data="/afs/cern.ch/work/j/jmartinb/D
   TCut selCut = Form("%s && %s",trigcut,evSelCut);
   cout << "Aplying the following event selection to 2015 data: " << selCut.GetTitle() << endl;
   
-  data2evSelCut = "pPAcollisionEventSelectionPA";
+  data2evSelCut = "pPAcollisionEventSelectionPA && run<211256";
   data2Trigg = "HLT_PAZeroBiasPixel_SingleTrack_v1";
   TCut data2Cut = Form("%s && %s",data2Trigg,data2evSelCut);
-  data2evSelCutCap = "pPAcollisionEventSelectionPA";
+  data2evSelCutCap = "pPAcollisionEventSelectionPA ; run<211256";
   cout << "Aplying the following event selection to 2013 data: " << data2Cut.GetTitle() << endl;
   
   compareTwo(t1, t2, "hiHF",nBin,0,hiHFMax,selCut,data2Cut, cap);
