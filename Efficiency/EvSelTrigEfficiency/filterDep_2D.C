@@ -26,7 +26,7 @@
 //////////// modify here as you want!! ////////////////
 const double dy= 0.5;
 
-void Get2DEffPlots(TTree* t_evt=0, TString v1="hiHF", TString v2="hiNpix", int xbin=200, double xmin=0, double xmax=4500, int ybin=200, double ymin=0, double ymax=10000, TCut cut="", const char* cap="",bool isPassed=1);
+void Get2DEffPlots(TTree* t_evt=0, TString v1="hiHF", TString v2="hiNpix", int xbin=200, double xmin=0, double xmax=4500, int ybin=200, double ymin=0, double ymax=10000, TCut cut="", const char* cap="",int isPassed=1);
 
 void filterDep_2D()
 {
@@ -47,14 +47,15 @@ void filterDep_2D()
     t_evt-> AddFriend(t_skim);
     t_evt-> AddFriend(t_hlt);
 
-    double hiNpixMax = 5000;
+    double hiNpixMax = 2000;
     double hiZDCMax = 80000;
-    double hiHFMax = 200;
-    double hiHFTrucMax = 100;
+    double hiHFMax = 250;
+    double hiHFTrucMax = 80;
+    double hiHFMinusMax = 150;
     double hiHFhitMax = 3000;
     int nbin = 100;
-    for(int i=0;i<2;i++){
-        Get2DEffPlots(t_evt, "hiHFplus","hiHFminus",nbin,0,hiHFMax,nbin,0,hiHFMax,cut,cut.GetTitle(),i);
+    for(int i=0;i<3;i++){
+        Get2DEffPlots(t_evt, "hiHFplus","hiHFminus",nbin,0,hiHFMax,nbin,0,hiHFMinusMax,cut,cut.GetTitle(),i);
         Get2DEffPlots(t_evt, "hiHFhitPlus","hiHFhitMinus",nbin,0,hiHFhitMax,nbin,0,hiHFhitMax,cut,cut.GetTitle(),i);
         Get2DEffPlots(t_evt, "hiHF","hiNpix",nbin,0,hiHFMax,nbin,0,hiNpixMax,cut,cut.GetTitle(),i);
         Get2DEffPlots(t_evt, "hiHFplusEta4","hiNtracks",nbin,0,hiHFTrucMax,nbin,0,hiHFMax,cut,cut.GetTitle(),i);
@@ -62,13 +63,23 @@ void filterDep_2D()
         //Get2DEffPlots(t_evt, "hiNpix","hiZDC",nbin,0,hiNpixMax,nbin,0,hiZDCMax,cut,cut.GetTitle(),cut,cut.GetTitle(),i);
     }
 }
-void Get2DEffPlots(TTree* t_evt, TString v1, TString v2, int xbin, double xmin, double xmax, int ybin, double ymin, double ymax, TCut cut, const char* cap,bool isPassed){
+void Get2DEffPlots(TTree* t_evt, TString v1, TString v2, int xbin, double xmin, double xmax, int ybin, double ymin, double ymax, TCut cut, const char* cap,int isPassed){
     TCut totcut[nfilter];
+        totcut[0] = evtfilter[0];
+        totcut[1] = (totcut[0] && trig);
+        if(isPassed==0)
+        totcut[1] = (totcut[0] && Form("!(%s)",trig));
     for(int i=0; i<nfilter;i++){
-        totcut[i] = "";
-        for(int j=1;j<=i;j++){
-        totcut[i] = totcut[i] && Form("%s==%d",evtfilter[j],(int)isPassed);
+        for(int j=2;j<=i;j++){
+        if(isPassed==1)
+        totcut[i] =  (totcut[i] && totcut[1] && Form("%s",evtfilter[j]));
+        if(isPassed==0){
+        totcut[i] = (totcut[0] && trig && Form("!(%s)",evtfilter[j]));
         }
+        if(isPassed==2)
+        totcut[i] = (totcut[1] && Form("%s",evtfilter[j]));
+        }
+        cout<<totcut[i].GetTitle()<<endl;
     } 
 
     TCanvas *c_temp = new TCanvas("c_temp", "c_temp", 300,300);
@@ -85,20 +96,43 @@ void Get2DEffPlots(TTree* t_evt, TString v1, TString v2, int xbin, double xmin, 
         TLatex t;
         t.SetTextSize(0.06);
         t.SetNDC();
+        float min = h2D[0]->GetMinimum()*(1.+gStyle->GetHistTopMargin());
+        float max = h2D[0]->GetMaximum()*(1.+gStyle->GetHistTopMargin());
     for(int i=0;i<nfilter;i++){
         c_tot->cd(i+1);
         h2D[i]->SetTitle("");
         h2D[i]->Draw("colz");
-        t.DrawLatex(0.2,0.85,evtfiltershort[i]);
+        h2D[i]->GetZaxis()->SetRangeUser(min,max);
+        if(isPassed==1)
+        t.DrawLatex(0.2,0.85,evtfilteraccushort[i]);
+        if(isPassed==0 && i>=2)
+        t.DrawLatex(0.2,0.85,Form("%s && !(%s)",evtfiltershort[1],evtfiltershort[i]));
+        if(isPassed==2 && i>=2)
+        t.DrawLatex(0.2,0.85,Form("%s && %s",evtfiltershort[1],evtfiltershort[i]));
+        if(isPassed==0 && i==0)
+        t.DrawLatex(0.2,0.85,Form("%s",evtfiltershort[i]));
+        if(isPassed==0 && i==1)
+        t.DrawLatex(0.2,0.85,Form("!(%s)",evtfiltershort[i]));
+        if(isPassed==2 && i<2)
+        t.DrawLatex(0.2,0.85,Form("%s",evtfiltershort[i]));
         gPad->SetLogz();
 
         c[i] = new TCanvas(Form("c%d",i), "", 300, 300);
         c[i]->cd();
         h2D[i]->SetTitle("");
         h2D[i]->Draw("colz");
-        t.DrawLatex(0.2,0.85,evtfiltershort[i]);
+        if(isPassed==1)
+        t.DrawLatex(0.2,0.85,evtfilteraccushort[i]);
+        if(isPassed==0 && i>=2)
+        t.DrawLatex(0.2,0.85,Form("%s && !(%s)",evtfiltershort[1],evtfiltershort[i]));
+        if(isPassed==2 && i>=2)
+        t.DrawLatex(0.2,0.85,Form("%s && %s",evtfiltershort[1],evtfiltershort[i]));
+        if(isPassed==0 && i<2)
+        t.DrawLatex(0.2,0.85,Form("%s",evtfiltershort[i]));
+        if(isPassed==2 && i<2)
+        t.DrawLatex(0.2,0.85,Form("%s",evtfiltershort[i]));
         gPad->SetLogz();
-        c[i]->SaveAs(Form("figure/filterDep_2D_%s_%s_%s_isPassed%d_%s.gif", v1.Data(),v2.Data(),cap,(int)isPassed, evtfilter[i]));
+        //c[i]->SaveAs(Form("figure/filterDep_2D_%s_%s_%s_isPassed%d_%s.gif", v1.Data(),v2.Data(),cap,(int)isPassed, evtfilter[i]));
     }
     c_tot->SaveAs(Form("figure/filterDep_2D_%s_%s_%s_isPassed%d.gif", v1.Data(),v2.Data(),cap,(int)isPassed));
 }
