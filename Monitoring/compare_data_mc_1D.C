@@ -72,7 +72,7 @@ void compare_data_mc_1D(const char* fname_data="root://eoscms//eos/cms/store/gro
   double hiHFMax = 300;
   double hiHFSSMax = 200;
   double hiHFSSTruncMax = 80;
-  double hiBinMax = 200;
+  double hiBinMax = 100;
   double hiHFhitMax = 8000;
   double hiETMax = 50;
   double hiEEMax = 50;
@@ -84,7 +84,7 @@ void compare_data_mc_1D(const char* fname_data="root://eoscms//eos/cms/store/gro
   double hiNtracksCutMax = 150;
   double hiZDCMax = 40000;
   
-  int nBin = 50;
+  int nBin = 100;
 //  const char* trigcut = "(HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part1_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part2_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part3_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part4_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part5_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part6_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part7_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part8_v1)";
    const char* trigcut = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_ForExpress_v1";
 //  trigcap = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part*";
@@ -106,11 +106,11 @@ void compare_data_mc_1D(const char* fname_data="root://eoscms//eos/cms/store/gro
   compareTwo(t1, t2, "hiET",nBin,0,hiETMax,selCut,mcCut, cap);
   compareTwo(t1, t2, "hiEB",nBin,0,hiEBMax,selCut,mcCut, cap);
   compareTwo(t1, t2, "hiEE",nBin,0,hiEEMax,selCut,mcCut, cap);
-  compareTwo(t1, t2, "hiNpix",nBin,0,hiNpixMax,selCut,mcCut, cap);
-  compareTwo(t1, t2, "hiNtracks",nBin,0,hiNtracksMax,selCut,mcCut, cap);
-  compareTwo(t1, t2, "hiNtracksPtCut",nBin,0,hiNtracksCutMax,selCut,mcCut, cap);
-  compareTwo(t1, t2, "hiNtracksEtaCut",nBin,0,hiNtracksCutEtaMax,selCut,mcCut, cap);
-  compareTwo(t1, t2, "hiNtracksEtaPtCut",nBin,0,hiNtracksCutMax,selCut,mcCut, cap);
+  compareTwo(t1, t2, "hiNpix",hiNpixMax/10,0,hiNpixMax,selCut,mcCut, cap);
+  compareTwo(t1, t2, "hiNtracks",hiNtracksMax/4,0,hiNtracksMax,selCut,mcCut, cap);
+  compareTwo(t1, t2, "hiNtracksPtCut",hiNtracksCutMax/4,0,hiNtracksCutMax,selCut,mcCut, cap);
+  compareTwo(t1, t2, "hiNtracksEtaCut",hiNtracksCutEtaMax/4,0,hiNtracksCutEtaMax,selCut,mcCut, cap);
+  compareTwo(t1, t2, "hiNtracksEtaPtCut",hiNtracksCutMax/4,0,hiNtracksCutMax,selCut,mcCut, cap);
   //  compareTwo(t1, t2, "hiNpixelTracks",nBin,0,hiNpixelTracksMax,selCut,mcCut, cap);
   compareTwo(t1, t2, "hiZDC",nBin,0,hiZDCMax,selCut,mcCut, cap);
   compareTwo(t1, t2, "hiZDCplus",nBin,0,hiZDCMax,selCut,mcCut, cap);
