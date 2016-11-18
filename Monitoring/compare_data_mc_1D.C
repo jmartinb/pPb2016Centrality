@@ -53,7 +53,7 @@ const char* evSelCutCap("");
 const char* mcCut("");
 
 void compareTwo(TTree* t1=0 ,TTree* t2=0,TString var="pt", int nBins=10, double xMin=0, double xMax=10, TCut cut1="(1)", TCut cut2="(1)", const string cap = "");
-void compare_data_mc_1D(const char* fname_data="/afs/cern.ch/work/j/jmartinb/DataSets/pPb2016/Forest/Data/285090/HiForest.root", const char* fname_mc="/afs/cern.ch/work/q/qixu/public/centrality/Run2Prep/5TeV/mergeskim_pPb_EposMinBias_5TeV_8022_Forest_corrCentrTable_161108_122954.root")
+void compare_data_mc_1D(const char* fname_data="root://eoscms//eos/cms/store/group/phys_heavyions/kjung/ExpressForests/v1/Merged/HiForest_run285090_Express.root", const char* fname_mc="/afs/cern.ch/work/q/qixu/public/centrality/Run2Prep/5TeV/mergeskim_pPb_EposMinBias_5TeV_8022_Forest_corrCentrTable_161108_122954.root")
 {
   TFile* f1 = TFile::Open(fname_data);
   TTree* t1 = (TTree*) f1 -> Get("hiEvtAnalyzer/HiTree");

@@ -42,7 +42,7 @@ const char* evSelCutCap;
 
 void plotVar(TTree* t1=0 ,TString var="hiHF", int nBins=10, double xMin=0, double xMax=10, TCut cut1="(1)", const string cap = "");
 //void plotCentVarsDistr(const char* fname = "/afs/cern.ch/work/j/jmartinb/DataSets/pPb2016/Forest/Data/285090/HiForest.root")
-void plotCentVarsDistr(const char* fname = "/afs/cern.ch/work/j/jmartinb/DataSets/pPb2016/Forest/Data/285090/HiForest.root")
+void plotCentVarsDistr(const char* fname = "root://eoscms//eos/cms/store/group/phys_heavyions/kjung/ExpressForests/v1/Merged/HiForest_run285090_Express.root")
 {
   TFile* f1 = TFile::Open(fname);
   TTree* t1 = (TTree*) f1 -> Get("hiEvtAnalyzer/HiTree");
@@ -69,34 +69,34 @@ void plotCentVarsDistr(const char* fname = "/afs/cern.ch/work/j/jmartinb/DataSet
   
   int nBin = 50;
 //  const char* trigcut = "(HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part1_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part2_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part3_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part4_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part5_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part6_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part7_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part8_v1)";
-  const char* trigcut = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_ForExpress_v1";
+  const char* trigcut = "HLT_PAL1MinimumBiasHF_AND_SinglePixelTrack_v1";
 //  trigcap = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part*";
-  trigcap = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_ForExpress_v1";
-  evSelCut = "pBeamScrapingFilter && pPAprimaryVertexFilter && phfCoincFilter1 && pVertexFilterCutG";
+  trigcap = "HLT_PAL1MinimumBiasHF_AND_SinglePixelTrack_v1";
+  evSelCut = "pBeamScrapingFilter && pPAprimaryVertexFilter && phfCoincFilter1 && pVertexFilterCutGplus && ((lumi>60 && lumi<132) || (lumi>135 && lumi<201) || (lumi>261 && lumi<369))";
   TCut selCut = Form("%s && %s",trigcut,evSelCut);
   const string cap = "pAExpress_5TeV_run285090";
-  evSelCutCap = "BS+PV+HFC+PVG";
+  evSelCutCap = "BS+PV+HFC+PVGP";
   cout << "Aplying the following event selection: " << selCut.GetTitle() << endl;
   
-  plotVar(t1, "hiHF",nBin,0,hiHFMax,selCut, cap);
-  plotVar(t1, "hiHFplus",nBin,0,hiHFSSMax,selCut, cap);
-  plotVar(t1, "hiHFminus",nBin,0,hiHFSSMax,selCut, cap);
+//  plotVar(t1, "hiHF",nBin,0,hiHFMax,selCut, cap);
+//  plotVar(t1, "hiHFplus",nBin,0,hiHFSSMax,selCut, cap);
+//  plotVar(t1, "hiHFminus",nBin,0,hiHFSSMax,selCut, cap);
   plotVar(t1, "hiHFplusEta4",nBin,0,hiHFSSTruncMax,selCut, cap);
-  plotVar(t1, "hiHFminusEta4",nBin,0,hiHFSSTruncMax,selCut, cap);
-  plotVar(t1, "hiBin",nBin,0,hiBinMax,selCut, cap);
-  plotVar(t1, "hiHFhit",nBin,0,hiHFhitMax,selCut, cap);
-  plotVar(t1, "hiET",nBin,0,hiETMax,selCut, cap);
-  plotVar(t1, "hiEB",nBin,0,hiEBMax,selCut, cap);
-  plotVar(t1, "hiEE",nBin,0,hiEEMax,selCut, cap);
-  plotVar(t1, "hiNpix",nBin,0,hiNpixMax,selCut, cap);
-  plotVar(t1, "hiNtracks",nBin,0,hiNtracksMax,selCut, cap);
-  plotVar(t1, "hiNtracksPtCut",nBin,0,hiNtracksCutMax,selCut, cap);
-  plotVar(t1, "hiNtracksEtaCut",nBin,0,hiNtracksCutEtaMax,selCut, cap);
-  plotVar(t1, "hiNtracksEtaPtCut",nBin,0,hiNtracksCutMax,selCut, cap);
-  //  plotVar(t1, "hiNpixelTracks",nBin,0,hiNpixelTracksMax,selCut, cap);
-  plotVar(t1, "hiZDC",nBin,0,hiZDCMax,selCut, cap);
-  plotVar(t1, "hiZDCplus",nBin,0,hiZDCMax,selCut, cap);
-  plotVar(t1, "hiZDCminus",nBin,0,hiZDCMax,selCut, cap);
+//  plotVar(t1, "hiHFminusEta4",nBin,0,hiHFSSTruncMax,selCut, cap);
+//  plotVar(t1, "hiBin",nBin,0,hiBinMax,selCut, cap);
+//  plotVar(t1, "hiHFhit",nBin,0,hiHFhitMax,selCut, cap);
+//  plotVar(t1, "hiET",nBin,0,hiETMax,selCut, cap);
+//  plotVar(t1, "hiEB",nBin,0,hiEBMax,selCut, cap);
+//  plotVar(t1, "hiEE",nBin,0,hiEEMax,selCut, cap);
+//  plotVar(t1, "hiNpix",nBin,0,hiNpixMax,selCut, cap);
+//  plotVar(t1, "hiNtracks",nBin,0,hiNtracksMax,selCut, cap);
+//  plotVar(t1, "hiNtracksPtCut",nBin,0,hiNtracksCutMax,selCut, cap);
+//  plotVar(t1, "hiNtracksEtaCut",nBin,0,hiNtracksCutEtaMax,selCut, cap);
+//  plotVar(t1, "hiNtracksEtaPtCut",nBin,0,hiNtracksCutMax,selCut, cap);
+//  //  plotVar(t1, "hiNpixelTracks",nBin,0,hiNpixelTracksMax,selCut, cap);
+//  plotVar(t1, "hiZDC",nBin,0,hiZDCMax,selCut, cap);
+//  plotVar(t1, "hiZDCplus",nBin,0,hiZDCMax,selCut, cap);
+//  plotVar(t1, "hiZDCminus",nBin,0,hiZDCMax,selCut, cap);
   
 } // main function
 
@@ -109,7 +109,7 @@ void plotVar(TTree* t1, TString var, int nBins, double xMin, double xMax, TCut c
   TCanvas* c=  new TCanvas(Form("c_%s",var.Data()),"", 700,600);
   if (strcmp(var,"hiBin")) gPad->SetLogy();
   
-  TH1D* h1 = new TH1D(Form("h1_%s",var.Data()), Form(";%s;",var.Data()), nBins,xMin,xMax);
+  TH1D* h1 = new TH1D(Form("h1_%s",var.Data()), Form(";%s;",var.Data()),nBins,xMin,xMax);
   h1->Sumw2();
   TString sName(Form("%s>>+%s",var.Data(),h1->GetName()));
   t1->Draw(sName.Data(), cut1);

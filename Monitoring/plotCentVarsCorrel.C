@@ -30,20 +30,25 @@
 #include "../utils.h"
 
 //const char* trigcut = "(HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part1_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part2_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part3_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part4_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part5_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part6_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part7_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part8_v1)";
-const char* trigcut = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_ForExpress_v1";
+const char* trigcut = "HLT_PAL1MinimumBiasHF_AND_SinglePixelTrack_v1";
 //const char* trigcap = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part*";
-const char* trigcap = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_ForExpress_v1";
+const char* trigcap = "HLT_PAL1MinimumBiasHF_AND_SinglePixelTrack_v1";
 const char* evSelCut = "pBeamScrapingFilter && pPAprimaryVertexFilter && phfCoincFilter1 && pVertexFilterCutG";
+//const char* evSelCut = "!pBeamScrapingFilter";
+//const char* evSelCut = "!pPAprimaryVertexFilter";
+//const char* evSelCut = "!phfCoincFilter1";
+//const char* evSelCut = "!pVertexFilterCutG";
+//const char* evSelCutCap = evSelCut;
 const char* evSelCutCap = "BS+PV+HFC+PVG";
 const string cap = "pAExpress_5TeV_run285090";
 //const char* cap = "MBFullEvtSel";
 TCut selCut = Form("%s && %s",trigcut,evSelCut);
-double maxZ = 200;
+double maxZ = 10000;
 
 void Get2DPlots(TTree* t_evt=0, TString v1="hiHF", TString v2="hiNpix", int xbin=200, double xmin=0, double xmax=4500, int ybin=200, double ymin=0, double ymax=10000, TCut cut="");
 
 //void plotCentVarsCorrel(const char* fname="root://eoscms//eos/cms/store/group/phys_heavyions/kjung/pPb_EposMinBias_5TeV_8022_Forest/EPOS5TeV_GEN_SIM/crab_pPb_EposMinBias_5TeV_8022_Forest_corrCentrTable/161108_122954/0000/HiForestAOD_92.root")
-void plotCentVarsCorrel(const char* fname="/afs/cern.ch/work/j/jmartinb/DataSets/pPb2016/Forest/Data/285090/HiForest.root")
+void plotCentVarsCorrel(const char* fname="root://eoscms//eos/cms/store/group/phys_heavyions/kjung/ExpressForests/v1/Merged/HiForest_run285090_Express.root")
 {
   cout << "Aplying the following event selection: " << selCut.GetTitle() << endl;
   
@@ -58,6 +63,8 @@ void plotCentVarsCorrel(const char* fname="/afs/cern.ch/work/j/jmartinb/DataSets
   TTree *t_hlt = (TTree*) fin -> Get("hltanalysis/HltTree");
   t_evt -> AddFriend(t_hlt);
   t_evt -> AddFriend(t_skim);
+  
+  cout << t_evt->GetEntries() << endl;
   
   double hiHFMax = 300;
   double hiHFSSMax = 200;

@@ -77,7 +77,7 @@ void draw_compare_runs_1D(string var, TCut trigCut, const string cap, bool presc
   if(Nrun%Ncomp!=0) Nset = (int)Nrun/Ncomp + 1;
   else Nset = (int)Nrun/Ncomp;
   
-  const char* dir[Nrun] = {"root://eoscms//eos/cms/store/group/phys_heavyions/kjung/ExpressForests/v1/Merged/HiForest_run285090_Express.root","root://eoscms//eos/cms/store/group/phys_heavyions/mverweij/forest/streamer/v1/000/285/216/merge395/HiForest_0.root"};
+  const char* dir[Nrun] = {"root://eoscms//eos/cms/store/group/phys_heavyions/kjung/ExpressForests/v1/Merged/HiForest_run285090_Express.root","root://eoscms//eos/cms/store/group/phys_heavyions/mverweij/forest/ExpressForests/v1/000/285/216/chunks/HiForest_0.root"};
   
   int nBin = 50;
 //  if(var=="hiBin") nBin=200;

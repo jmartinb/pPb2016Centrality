@@ -1,5 +1,5 @@
 // comparison centrality objects between DATA 2016 and DATA 2015
-// Author :
+// Author : Javier Martin Blanco 10/11/2016
 
 //basic c++ header, string ...
 #include <iostream>
@@ -54,7 +54,7 @@ const char* data2evSelCutCap("");
 const char* data2Trigg("");
 
 void compareTwo(TTree* t1=0 ,TTree* t2=0,TString var="pt", int nBins=10, double xMin=0, double xMax=10, TCut cut1="(1)", TCut cut2="(1)", const string cap = "");
-void compare_data_data_1D(const char* fname_data="/afs/cern.ch/work/j/jmartinb/DataSets/pPb2016/Forest/Data/285090/HiForest.root", const char* fname_data2="root://eoscms//eos/cms/store/group/phys_heavyions/yjlee/pPb2013/promptReco/PA2013_HiForest_PromptReco_HLT_SingleTrack_JSonPPb_forestv84.root")
+void compare_data_data_1D(const char* fname_data="root://eoscms//eos/cms/store/group/phys_heavyions/kjung/ExpressForests/v1/Merged/HiForest_run285090_Express.root", const char* fname_data2="root://eoscms//eos/cms/store/group/phys_heavyions/yjlee/pPb2013/promptReco/PA2013_HiForest_PromptReco_HLT_SingleTrack_JSonPPb_forestv84.root")
 {
   TFile* f1 = TFile::Open(fname_data);
   TTree* t1 = (TTree*) f1 -> Get("hiEvtAnalyzer/HiTree");
@@ -87,9 +87,9 @@ void compare_data_data_1D(const char* fname_data="/afs/cern.ch/work/j/jmartinb/D
   
   int nBin = 50;
 //  const char* trigcut = "(HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part1_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part2_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part3_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part4_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part5_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part6_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part7_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part8_v1)";
-   const char* trigcut = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_ForExpress_v1";
+   const char* trigcut = "HLT_PAL1MinimumBiasHF_AND_SinglePixelTrack_v1";
 //  trigcap = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part*";
-  trigcap = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_ForExpress_v1";
+  trigcap = "HLT_PAL1MinimumBiasHF_AND_SinglePixelTrack_v1";
   evSelCut = "pBeamScrapingFilter && pPAprimaryVertexFilter && phfCoincFilter1 && pVertexFilterCutG";
   const string cap = "pAExpress_5TeV_run285090";
   evSelCutCap = "BS+PV+HFC+PVG";
