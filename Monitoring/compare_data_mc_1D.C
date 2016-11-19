@@ -29,6 +29,7 @@
 #include <cmath>
 #include <TLorentzRotation.h>
 #include <TCut.h>
+#include <TString.h>
 //canvas, legend, latex ... //cosmetic
 #include <TCanvas.h>
 #include <TStyle.h>
@@ -51,16 +52,31 @@ const char* trigcap("");
 const char* evSelCut("");
 const char* evSelCutCap("");
 const char* mcCut("");
+TString lumiCut;
 
 void compareTwo(TTree* t1=0 ,TTree* t2=0,TString var="pt", int nBins=10, double xMin=0, double xMax=10, TCut cut1="(1)", TCut cut2="(1)", const string cap = "");
 void compare_data_mc_1D(const char* fname_data="root://eoscms//eos/cms/store/group/phys_heavyions/kjung/ExpressForests/v1/Merged/HiForest_run285090_Express.root", const char* fname_mc="/afs/cern.ch/work/q/qixu/public/centrality/Run2Prep/5TeV/mergeskim_pPb_EposMinBias_5TeV_8022_Forest_corrCentrTable_161108_122954.root")
 {
+/*
   TFile* f1 = TFile::Open(fname_data);
   TTree* t1 = (TTree*) f1 -> Get("hiEvtAnalyzer/HiTree");
   TTree* t1_skim = (TTree*) f1 -> Get("skimanalysis/HltTree");
   TTree* t1_hlt = (TTree*) f1 -> Get("hltanalysis/HltTree");
+*/
+	TChain* t1 = new TChain("hiEvtAnalyzer/HiTree");
+	TChain* t1_skim = new TChain("skimanalysis/HltTree");
+	TChain* t1_hlt = new TChain("hltanalysis/HltTree");
+
+	for(Int_t i = 0; i < 19; i++)
+	{
+		t1->Add(Form("%s%d.root", fname_data, i));
+		t1_skim->Add(Form("%s%d.root", fname_data, i));
+		t1_hlt->Add(Form("%s%d.root", fname_data, i));
+	}
+
   t1->AddFriend(t1_skim);
   t1->AddFriend(t1_hlt);
+
   TFile* f2 = TFile::Open(fname_mc);
   TTree* t2 = (TTree*) f2 -> Get("hiEvtAnalyzer/HiTree");
   TTree* t2_skim = (TTree*) f2 -> Get("skimanalysis/HltTree");
@@ -85,14 +101,16 @@ void compare_data_mc_1D(const char* fname_data="root://eoscms//eos/cms/store/gro
   double hiZDCMax = 40000;
   
   int nBin = 100;
-//  const char* trigcut = "(HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part1_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part2_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part3_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part4_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part5_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part6_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part7_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part8_v1)";
-   const char* trigcut = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_ForExpress_v1";
-//  trigcap = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part*";
-  trigcap = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_ForExpress_v1";
+   const char* trigcut = "(HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part1_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part2_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part3_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part4_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part5_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part6_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part7_v1 || HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part8_v1)";
+  //const char* trigcut = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_ForExpress_v1";
+  trigcap = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part*";
+  //trigcap = "HLT_PAL1MinimumBiasHF_AND_SinglePixelTrack_ForExpress_v1";
   evSelCut = "pBeamScrapingFilter && pPAprimaryVertexFilter && phfCoincFilter1 && pVertexFilterCutG";
-  const string cap = "pAExpress_5TeV_run285090";
+	lumiCut = "(lumi > 60 && lumi < 200) || (lumi > 270 && lumi < 360)";
+  //const string cap = "pAExpress_5TeV_run285090";
+  const string cap = "pAPromptReco_5TeV_run285090";
   evSelCutCap = "BS+PV+HFC+PVG";
-  TCut selCut = Form("%s && %s",trigcut,evSelCut);
+  TCut selCut = Form("%s && %s && %s",trigcut,evSelCut, lumiCut.Data());
   cout << "Aplying the following event selection: " << selCut.GetTitle() << endl;
   
   mcCut = ""; //"pcollisionEventSelection";
