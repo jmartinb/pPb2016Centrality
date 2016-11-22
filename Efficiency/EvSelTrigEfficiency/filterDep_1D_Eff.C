@@ -116,12 +116,12 @@ void Get1DEffPlots(TTree* t_evt, TString v1, int xbin, double xmin, double xmax,
     for(int i=0; i<nfilter; i++){
         t_evt->Draw(Form("%s>>+%s",v1.Data(), h1D[i]->GetName()), totcut[i]);
         h1D[i]=(TH1D*)gDirectory->Get(h1D[i]->GetName());
-        if(i!=0) h1D_eff[i] -> Divide(h1D[i],h1D[0],1,1,"B");
+        if(i!=0) h1D_eff[i] -> Divide(h1D[i],h1D[1],1,1,"B");
     }
     if(v1=="hiBin")
     TLegend* l1 = new TLegend(0.30, 0.19, 0.9, 0.58, Form("%s",cap.Data()));
     else
-    TLegend* l1 = new TLegend(0.30, 0.54, 0.9, 0.94, Form("%s",cap.Data()));
+    TLegend* l1 = new TLegend(0.40, 0.64, 0.9, 0.94, Form("%s",cap.Data()));
     legStyle(l1);
     l1->SetTextSize(0.04);
     for(int i=0; i<nfilter;i++){
