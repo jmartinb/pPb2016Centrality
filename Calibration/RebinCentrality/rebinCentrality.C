@@ -26,12 +26,14 @@ void rebinCentrality(){
   
   float hiHF,hiHFplus,hiHFminus,hiHFminusEta4,hiHFplusEta4;
   int hiNtracks;
+  UInt_t lumi;
   
   int oldbin, newbin;
   float hf;
   float hfbins[100];
   getBins(hfbins);
   
+  t[0]->SetBranchAddress("lumi",&lumi);
   t[0]->SetBranchAddress("hiHFplusEta4",&hiHFplusEta4);
   t[0]->SetBranchAddress("hiBin",&oldbin);
   t[0]->SetBranchAddress("hiHF",&hiHF);
@@ -46,8 +48,8 @@ void rebinCentrality(){
   outf->cd(dirs[0].data());
   TTree* tnew = new TTree(trees[0].data(),"");
   
+  tnew->Branch("lumi",&lumi,"lumi/F");
   tnew->Branch("hiHF",&hiHF,"hiHF/F");
-  
   tnew->Branch("hiHFplus",&hiHFplus,"hiHFplus/F");
   tnew->Branch("hiHFminus",&hiHFminus,"hiHFminus/F");
   tnew->Branch("hiNtracks",&hiNtracks,"hiNtracks/I");
