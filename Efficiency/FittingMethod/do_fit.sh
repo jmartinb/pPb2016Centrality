@@ -1,5 +1,5 @@
 #!/bin/bash
-#do_fit.C(TString var, bool PV, bool BS, const Int_t GF, const Int_t Coin, TString MCver)
+#do_fit.C(TString var, bool PV, bool BS, const Int_t GF, const Int_t Coin, Int_t MCver)
 #PV = pPAprimaryVertexFilter
 #BS = pBeamScrapingFilter
 #GF = 0: no filter, 1: pVertexFilterCutG, 2: pVertexFilterCutGplus
