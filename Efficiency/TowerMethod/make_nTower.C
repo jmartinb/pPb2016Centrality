@@ -46,19 +46,23 @@ void makeHist_nTower(float thr, const Int_t var, bool PV, bool BS, const Int_t G
     TH1::SetDefaultSumw2();
 
 //Cuts{{{
-	TString PVfilter;
-	if(PV) PVfilter = "pPAprimaryVertexFilter";
-	TString BSfilter;
-	if(BS) BSfilter = "pBeamScrapingFilter";
-	TString Gfilter;
-	if(GF == 1) Gfilter = "pVertexFilterCutG";
-	else if(GF == 2) Gfilter = "pVertexFilterCutGplus";
-	TString Coinfilter;
-	if(Coin == 1) Coinfilter = "phfCoincFilter1";
-	else if(Coin == 2) Coinfilter = "phfCoincFilter2";
-	else if(Coin == 3) Coinfilter = "phfCoincFilter3";
-	else if(Coin == 4) Coinfilter = "phfCoincFilter4";
-	TString Trigger = "HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part1_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part2_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part3_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part4_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part5_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part6_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part7_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part8_v2==1";
+	TCut PVfilter;
+	if(PV) PVfilter = "pPAprimaryVertexFilter==1";
+	else PVfilter = "";
+	TCut BSfilter;
+	if(BS) BSfilter = "pBeamScrapingFilter==1";
+	else BSfilter = "";
+	TCut Gfilter;
+	if(GF == 1) Gfilter = "pVertexFilterCutG==1";
+	else if(GF == 2) Gfilter = "pVertexFilterCutGplus==1";
+	else Gfilter = "";
+	TCut Coinfilter;
+	if(Coin == 1) Coinfilter = "phfCoincFilter1==1";
+	else if(Coin == 2) Coinfilter = "phfCoincFilter2==1";
+	else if(Coin == 3) Coinfilter = "phfCoincFilter3==1";
+	else if(Coin == 4) Coinfilter = "phfCoincFilter4==1";
+	else Coinfilter = "";
+	TCut Trigger = "(HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part1_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part2_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part3_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part4_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part5_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part6_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part7_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part8_v2==1)";
 //}}}
 
 // Get Trees from data & mc files.{{{
@@ -128,22 +132,7 @@ void makeHist_nTower(float thr, const Int_t var, bool PV, bool BS, const Int_t G
 //fill histogram{{{
         if(i==0)
 			{
-				if(PV && BS && GF != 0 && Coin != 0) t_rec[i]->Draw(Form("Sum$(%s)>>+%s",towerCut.Data(),h1F[i]->GetName()), Form("(%s)&&%s==1&&%s==1&&%s==1&&%s==1", Trigger.Data(), PVfilter.Data(), BSfilter.Data(), Gfilter.Data(), Coinfilter.Data()));
-				else if(!PV && BS && GF != 0 && Coin != 0) t_rec[i]->Draw(Form("Sum$(%s)>>+%s",towerCut.Data(),h1F[i]->GetName()), Form("(%s)&&%s==1&&%s==1&&%s==1", Trigger.Data(), BSfilter.Data(), Gfilter.Data(), Coinfilter.Data()));
-				else if(PV && !BS && GF != 0 && Coin != 0) t_rec[i]->Draw(Form("Sum$(%s)>>+%s",towerCut.Data(),h1F[i]->GetName()), Form("(%s)&&%s==1&&%s==1&&%s==1", Trigger.Data(), PVfilter.Data(), Gfilter.Data(), Coinfilter.Data()));
-				else if(PV && BS && GF == 0 && Coin != 0) t_rec[i]->Draw(Form("Sum$(%s)>>+%s",towerCut.Data(),h1F[i]->GetName()), Form("(%s)&&%s==1&&%s==1&&%s==1", Trigger.Data(), PVfilter.Data(), BSfilter.Data(), Coinfilter.Data()));
-				else if(PV && BS && GF != 0 && Coin == 0) t_rec[i]->Draw(Form("Sum$(%s)>>+%s",towerCut.Data(),h1F[i]->GetName()), Form("(%s)&&%s==1&&%s==1&&%s==1", Trigger.Data(), PVfilter.Data(), BSfilter.Data(), Gfilter.Data()));
-				else if(!PV && !BS && GF != 0 && Coin != 0) t_rec[i]->Draw(Form("Sum$(%s)>>+%s",towerCut.Data(),h1F[i]->GetName()), Form("(%s)&&%s==1&&%s==1", Trigger.Data(), Gfilter.Data(), Coinfilter.Data()));
-				else if(!PV && BS && GF == 0 && Coin != 0) t_rec[i]->Draw(Form("Sum$(%s)>>+%s",towerCut.Data(),h1F[i]->GetName()), Form("(%s)&&%s==1&&%s==1", Trigger.Data(), BSfilter.Data(), Coinfilter.Data()));
-				else if(!PV && BS && GF != 0 && Coin == 0) t_rec[i]->Draw(Form("Sum$(%s)>>+%s",towerCut.Data(),h1F[i]->GetName()), Form("(%s)&&%s==1&&%s==1", Trigger.Data(), BSfilter.Data(), Gfilter.Data()));
-				else if(PV && !BS && GF == 0 && Coin != 0) t_rec[i]->Draw(Form("Sum$(%s)>>+%s",towerCut.Data(),h1F[i]->GetName()), Form("(%s)&&%s==1&&%s==1", Trigger.Data(), PVfilter.Data(), Coinfilter.Data()));
-				else if(PV && !BS && GF != 0 && Coin == 0) t_rec[i]->Draw(Form("Sum$(%s)>>+%s",towerCut.Data(),h1F[i]->GetName()), Form("(%s)&&%s==1&&%s==1", Trigger.Data(), PVfilter.Data(), Gfilter.Data()));
-				else if(PV && BS && GF == 0 && Coin == 0) t_rec[i]->Draw(Form("Sum$(%s)>>+%s",towerCut.Data(),h1F[i]->GetName()), Form("(%s)&&%s==1&&%s==1", Trigger.Data(), PVfilter.Data(), BSfilter.Data()));
-				else if(PV && !BS && GF == 0 && Coin == 0) t_rec[i]->Draw(Form("Sum$(%s)>>+%s",towerCut.Data(),h1F[i]->GetName()), Form("(%s)&&%s==1", Trigger.Data(), PVfilter.Data()));
-				else if(!PV && BS && GF == 0 && Coin == 0) t_rec[i]->Draw(Form("Sum$(%s)>>+%s",towerCut.Data(),h1F[i]->GetName()), Form("(%s)&&%s==1", Trigger.Data(), BSfilter.Data()));
-				else if(!PV && !BS && GF != 0 && Coin == 0) t_rec[i]->Draw(Form("Sum$(%s)>>+%s",towerCut.Data(),h1F[i]->GetName()), Form("(%s)&&%s==1", Trigger.Data(), Gfilter.Data()));
-				else if(!PV && !BS && GF == 0 && Coin != 0) t_rec[i]->Draw(Form("Sum$(%s)>>+%s",towerCut.Data(),h1F[i]->GetName()), Form("(%s)&&%s==1", Trigger.Data(), Coinfilter.Data()));
-				else if(!PV && !BS && GF != 0 && Coin != 0) t_rec[i]->Draw(Form("Sum$(%s)>>+%s",towerCut.Data(),h1F[i]->GetName()), "");
+				t_rec[i]->Draw(Form("Sum$(%s)>>+%s",towerCut.Data(),h1F[i]->GetName()), trigger&&PVfilter&&BSfilter&&Gfilter&&Coinfilter);
 			}
         else if(i==1) t_rec[i]->Draw(Form("Sum$(%s)>>+%s",towerCut.Data(),h1F[i]->GetName()), "");
 //}}}
