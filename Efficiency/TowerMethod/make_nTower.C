@@ -63,6 +63,7 @@ void makeHist_nTower(float thr, const Int_t var, bool PV, bool BS, const Int_t G
 	else if(Coin == 4) Coinfilter = "phfCoincFilter4==1";
 	else Coinfilter = "";
 	TCut Trigger = "(HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part1_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part2_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part3_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part4_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part5_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part6_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part7_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part8_v2==1)";
+	TCut Lumi = "(67<lumi&&lumi<1540)";
 //}}}
 
 // Get Trees from data & mc files.{{{
@@ -71,10 +72,12 @@ void makeHist_nTower(float thr, const Int_t var, bool PV, bool BS, const Int_t G
     TChain* t_skim[2];
     TChain* t_hlt[2];
     TChain* t_rec[2];
-    const char* fname_data_pre = "root://eoscms//eos/cms/store/group/phys_heavyions/dhangal/pr_forests/PAMinimumBias/v5/000/285/993/HiForest_";
+	TChain* t_evt;
+    const char* fname_data_pre = "root://eoscms//eos/cms/store/group/phys_heavyions/dhangal/pr_forests/PAMinimumBias/v5/000/285/530/HiForest_";
     const char* fname_mc_EPOS_pre = "root://eoscms//eos/cms/store/group/phys_heavyions/jmartinb/pPb2016/MC/EPOS8TeV/HiForest_pPbEPOS8TeV_RECODEBUG";
     const char* fname_mc_HIJING_pre = "root://eoscms//eos/cms/store/group/phys_heavyions/jmartinb/pPb2016/MC/EPOS8TeV/HiForest_pPbEPOS8TeV_RECODEBUG";//not available yet
 
+    t_evt = new TChain("hiEvtAnalyzer/HiTree");
     for(int i=0;i<2;i++){ 
         t_skim[i] = new TChain("skimanalysis/HltTree");
         t_hlt[i] = new TChain("hltanalysis/HltTree");
@@ -86,6 +89,8 @@ void makeHist_nTower(float thr, const Int_t var, bool PV, bool BS, const Int_t G
 					t_skim[0]->Add(Form("%s%d.root", fname_data_pre, j));
 					t_hlt[0]->Add(Form("%s%d.root", fname_data_pre, j));
 					t_rec[0]->Add(Form("%s%d.root", fname_data_pre, j));
+					t_evt->Add(Form("%s%d.root", fname_data_pre, j));
+					t_rec[0] -> AddFriend(t_evt);
 				}
 			}
 			else if(MCver == 0)

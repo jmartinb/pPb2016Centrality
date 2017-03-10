@@ -108,7 +108,7 @@ TH1* scale(TString var, TTree* nt, double sf = 1, TCut cut = ""){
 void fit(TString var = "hiHF", bool PV = true, bool BS = true, const Int_t GF = 0, const Int_t Coin = 1, const Int_t MCver = 0){
 
 //Get tree{{{
-	TString RDname = "root://eoscms//eos/cms/store/group/phys_heavyions/dhangal/pr_forests/PAMinimumBias/v5/000/285/993/HiForest_";
+	TString RDname = "root://eoscms//eos/cms/store/group/phys_heavyions/dhangal/pr_forests/PAMinimumBias/v5/000/285/530/HiForest_";
 	TString MCEname = "root://eoscms//eos/cms/store/group/phys_heavyions/jmartinb/pPb2016/MC/EPOS8TeV/HiForest_pPbEPOS8TeV_RECODEBUG";
 	TString MCHname = "root://eoscms//eos/cms/store/group/phys_heavyions/jmartinb/pPb2016/MC/EPOS8TeV/HiForest_pPbEPOS8TeV_RECODEBUG";//not available yet
 	TString UPCname = "root://eoscms//eos/cms/store/group/phys_heavyions/jmartinb/pPb2016/MC/EPOS8TeV/HiForest_pPbEPOS8TeV_RECODEBUG";//not available yet
@@ -176,17 +176,18 @@ void fit(TString var = "hiHF", bool PV = true, bool BS = true, const Int_t GF = 
 	else if(Coin == 3) Coinfilter = "phfCoincFilter3==1";
 	else if(Coin == 4) Coinfilter = "phfCoincFilter4==1";
 	else Coinfilter = "";
+	TCut Lumi = "(67<lumi&&lumi<1540)";
 
     TH1::SetDefaultSumw2();
     TH1* hupc, *href;
 
     if(doUPC){
         //WARNING : No trigger for UPC
-        hupc = scale(var.Data(),t_UPC_evt,1., PVfilter&&BSfilter&&Gfilter&&Coinfilter);
+        hupc = scale(var.Data(),t_UPC_evt,1., PVfilter&&BSfilter&&Gfilter&&Coinfilter&&Lumi);
         hupc->SetLineColor(4);
         hupc->SetName("hupc");
     }
-    href = scale(var.Data(),t_RD_evt,1.,trigger&&PVfilter&&BSfilter&&Gfilter&&Coinfilter);
+    href = scale(var.Data(),t_RD_evt,1.,trigger&&PVfilter&&BSfilter&&Gfilter&&Coinfilter&&Lumi);
 
     cout<<"DATA ENTRIES : "<<t_RD_evt->GetEntries(trigger&&PVfilter&&BSfilter&&Gfilter&&Coinfilter)<<endl;
 
