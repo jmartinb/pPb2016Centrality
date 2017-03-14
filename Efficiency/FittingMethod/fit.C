@@ -68,14 +68,14 @@ TH1* scale(TString var, TTree* nt, double sf = 1, TCut cut = ""){
     }
 
     if(var == "hiHF"){
-        xmax = 6000;
+        xmax = 1000;
         rangeMin = 200;
         if(doLargeRangeMin) rangeMin = 1000;
     }
 
     if(var == "hiHFhit"){
-        xmax = 200000;
-        rangeMin = 10000;
+        xmax = 10000;
+        rangeMin = 1000;
         if(doLargeRangeMin) rangeMin = 50000;
     }
 
@@ -90,6 +90,22 @@ TH1* scale(TString var, TTree* nt, double sf = 1, TCut cut = ""){
         rangeMin = 200;
         if(doLargeRangeMin) rangeMin = 400;
     }
+	if(var == "hiHFminusEta4"){
+		xmax = 100;
+		rangeMin = 10;
+	}
+	if(var == "hiHFminus"){
+		xmax = 300;
+		rangeMin = 10;
+	}
+	if(var == "hiHFplusEta4"){
+		xmax = 100;
+		rangeMin = 10;
+	}
+	if(var == "hiHFplus"){
+		xmax = 300;
+		rangeMin = 10;
+	}
 //}}}
 
     TH1D* h = new TH1D("h",Form(";%s [GeV];event fraction",var.Data()),nbins,xmin,xmax);
@@ -159,7 +175,8 @@ void fit(TString var = "hiHF", bool PV = true, bool BS = true, const Int_t GF = 
 	}
 //}}}
 
-	TCut trigger = "(HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part1_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part2_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part3_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part4_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part5_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part6_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part7_v2==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part8_v2==1)";
+//Cuts{{{
+	TCut trigger = "(HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part1_v1==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part2_v1==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part3_v1==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part4_v1==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part5_v1==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part6_v1==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part7_v1==1||HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_part8_v1==1)";
 	TCut PVfilter;
 	if(PV) PVfilter = "pPAprimaryVertexFilter==1";
 	else PVfilter = "";
@@ -177,6 +194,7 @@ void fit(TString var = "hiHF", bool PV = true, bool BS = true, const Int_t GF = 
 	else if(Coin == 4) Coinfilter = "phfCoincFilter4==1";
 	else Coinfilter = "";
 	TCut Lumi = "(67<lumi&&lumi<1540)";
+//}}}
 
     TH1::SetDefaultSumw2();
     TH1* hupc, *href;
